@@ -1,0 +1,132 @@
+graph = { }
+class waterjug():
+    initial = (0,0) # for the first state starting value of the jug is taken to be (0,0) and for this state user would enter the capacity for jugs which should be greater than 1.
+    
+    Maximum_cap = [ 0,0]#in starting the maximum capacity will be taken as (0,0) then after user will define the maximum capacity.
+    
+    Goal = [ ] # Goal is where the user wants each value to hit exactly.
+    
+    v_nodes = [(0,0)] #v_nodes contains the visited nodes whom we need not to traverse again and again.
+    
+    # function to give the maximum capacity of each jugs
+    def Maximum_capacity(self):
+        print("Enter the value for Jug 1 that should be greater than 1")
+        jug1 = int(input())
+        print("Enter the value for jug 2 that should be greater than 1")
+        jug2 = int(input())
+        if jug1 >1 and jug2 >1:
+            self.Maximum_cap = [jug1,jug2]
+            self.goal_of_the_jugs()
+        else:
+            print("You have entered the wrong value")
+            print("Re-enter the value for Jug 1")
+            jug1 = int(input())
+            print("Re-enter the value for jug 2")
+            jug2 = int(input())
+            if jug1>1 and jug2>1:
+                self.Maximum_cap = [jug1,jug2]
+                self.goal_of_the_jugs()
+                
+    #Target
+    def goal_of_the_jugs(self):
+        print("Enter the target that has to be reached")
+          Goalvalue= int(input())
+            
+        #the goal value should not be greater than the capacity of the jugs
+        for i  in range (max(self.Maximum_cap[0],self.Maximum_cap[1])+1):
+            self.Goal.append((Goalvalue,i))
+            self.Goal.append((i,Goalvalue))
+        self.dfs(self.initial)
+    def dfs(self,initial):
+        if initial in self.Goal:
+            self.print()
+        else:
+            
+             #fill Jug 1 to maximum capacity and Jug 2 is empty
+            if not  self.v_nodes.__contains__((self.Maximum_cap[0],initial[1])):
+                graph[initial]=[[self.Maximum_cap[0],initial[1]]]
+                graph[self.Maximum_cap[0],initial[1]] = [ ]
+                self.v_nodes.append((self.Maximum_cap[0],initial[1]))
+                currentstate = (self.Maximum_cap[0],initial[1])
+                self.dfs(currentstate)
+                
+            #now lets fill jug 2 with the initial state which will be equal to the current state now
+
+            if not self.v_nodes.__contains__((initial[0],self.Maximum_cap[1])):
+                graph[initial]=[initial[0],self.Maximum_cap[1]]
+                graph[initial[0],self.Maximum_cap[1]]=[ ]
+                self.v_nodes.append((initial[0],self.Maximum_cap[1]))
+                currentstate = (initial[0],self.Maximum_cap[1])
+                self.dfs(currentstate)
+            #empty Jug 1
+            if not self.v_nodes.__contains__((0,initial[1])):
+                graph[initial]=[0,initial[1]]
+                graph[0,initial[1]]=[ ]
+                self.v_nodes.append((0,initial[1]))
+                currentstate = (0,initial[1])
+                self.dfs(currentstate)
+
+            #transfering from jug2 to jug1
+            jug1left = self.Maximum_cap[0] -initial[0]
+            if jug1left >= initial[1]:
+                if not self.v_nodes.__contains__((initial[0]+initial[1],0)):
+                    graph[initial]=[initial[0]+initial[1],0]
+                    graph[initial[0]+initial[1],0]= [ ]
+                    self.v_nodes.append((initial[0]+initial[1],0))
+                    currentstate = (initial[0]+initial[1],0)
+                    self.dfs(currentstate)
+
+            else:
+                if not self.v_nodes.__contains__((initial[0]+jug1left,initial[1]-jug1left)):
+                    graph[initial]= [initial[0]+jug1left,initial[1]-jug1left]
+                    graph[initial[0]+jug1left,initial[1]-jug1left] = [ ]
+                    self.v_nodes.append((initial[0]+jug1left,initial[1]-jug1left))
+                    currentstate = (initial[0]+jug1left,initial[1]-jug1left)
+                    self.dfs(currentstate)
+
+
+
+            #emptying jug 2
+            if not self.v_nodes.__contains__((initial[0],0)):
+                graph[initial]=[initial[0],0]
+                graph[initial[0],0] = [ ]
+                self.v_nodes.append((initial[0],0))
+                currentstate = (initial[0],0)
+                self.dfs(currentstate)
+                
+            #transfering from jug1 to jug 2
+
+            jug2left = self.Maximum_cap[1]-initial[1]
+            if jug2left >= initial[0]:
+                
+                #this means that jug1 does not have the water enough to fill the jug1 fully hence we will pour
+                # the entire water of jug 1 to jug 2 therefore jug 1 = 0 and jug 2 = jug2(initial)+ whatever thier was in jug1 (initial(0))
+                if not self.v_nodes.__contains__((0,initial[1]+initial[0])):
+                    graph[initial] = [0,initial[1]+initial[0]]
+                    graph[0,initial[1]+initial[0]] = [ ]
+                    self.v_nodes.append((0,initial[1]+initial[0]))
+                    currentstate = (0,initial[1]+initial[0])
+                    self.dfs(currentstate)
+
+            else:
+                #this means that jug1 has more water than it is required to fill jug 2
+                #hence jug 1 = initial[0] - water needed by the jug2 [jug2left],
+                #jug2 = initial[1]+water required to fill [jug2left]
+                if not self.v_nodes.__contains__((initial[0]-jug2left,initial[1]+jug2left)):
+                    graph[initial]=[initial[0]-jug2left,initial[1]+jug2left]
+                    graph[initial[0]-jug2left,initial[1]+jug2left] = [ ]
+                    self.v_nodes.append((initial[0]-jug2left,initial[1]+jug2left))
+                    currentstate = (initial[0]-jug2left,initial[1]+jug2left)
+                    self.dfs(currentstate)
+
+    def print(self):
+            print(graph)
+            exit(0)
+
+
+
+
+jug = waterjug()
+jug.Maximum_capacity()
+
+
